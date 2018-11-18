@@ -19,6 +19,11 @@ panel.hist <- function(x, ...)
     y <- h$counts; y <- y/max(y)
     rect(breaks[-nB], 0, breaks[-1], y, col = "cyan", ...)
 }
+
+addConstantForLogTransform <- function(x)
+{
+  returnValue = x + (1 - min(x))
+}
 ```
 
 ```{r importData}
@@ -36,12 +41,12 @@ pairs(~shot_zone_basic+shot_zone_area+shot_zone_range+game_date+opponent+attenda
 ```
 
 ```{r logTransformations}
+trainData$log_lat = log(trainData$lat)
 #we have 0s in the shot_distance field, so we need to add a small number so we can take the log transform.
 trainData$log_shot_distance = log(trainData$shot_distance + 0.001)
 #we have negative values in the following fields, so we need to add a constant so we can take the log tranform.
-trainData$log_lat = log(trainData$lat + (1 - min(trainData$lat)))
-trainData$log_loc_y = log(trainData$loc_y + (1 - min(trainData$loc_y)))
+trainData$log_loc_y = log(addConstantForLogTransform(trainData$loc_y))
 
-#the above log transformations don't seem to help at all.
+#the above log transformations don't seem to help much at all.
 pairs(~log_shot_distance+log_lat+log_loc_y,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 ```
