@@ -9,3 +9,28 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r addUtilityFunctions}
+panel.hist <- function(x, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(usr[1:2], 0, 1.5) )
+    h <- hist(x, plot = FALSE)
+    breaks <- h$breaks; nB <- length(breaks)
+    y <- h$counts; y <- y/max(y)
+    rect(breaks[-nB], 0, breaks[-1], y, col = "cyan", ...)
+}
+```
+
+```{r importData}
+trainData <- read.csv("project2Data.csv")
+
+```
+
+```{r outlierAnalysis}
+pairs(~shot_made_flag+action_type+combined_shot_type+lat+lon+loc_x+loc_y,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
+
+pairs(~shot_made_flag+minutes_remaining+seconds_remaining+period+playoffs+season+shot_distance+shot_type,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
+
+pairs(~shot_made_flag+shot_zone_basic+shot_zone_area+shot_zone_range+game_date+opponent+attendance+arena_temp+avgnoisedb,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
+
+```
