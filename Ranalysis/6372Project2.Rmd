@@ -1,6 +1,6 @@
 ---
 title: "6372Project2"
-author: "Shon Mohsin"
+author: "Shon Mohsin, Daniel Serna, William Trevino"
 date: "November 3, 2018"
 output: html_document
 ---
@@ -29,8 +29,19 @@ trainData <- read.csv("project2Data.csv")
 ```{r outlierAnalysis}
 pairs(~shot_made_flag+action_type+combined_shot_type+lat+lon+loc_x+loc_y,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 
-pairs(~shot_made_flag+minutes_remaining+seconds_remaining+period+playoffs+season+shot_distance+shot_type,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
+pairs(~minutes_remaining+seconds_remaining+period+playoffs+season+shot_distance+shot_type,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 
-pairs(~shot_made_flag+shot_zone_basic+shot_zone_area+shot_zone_range+game_date+opponent+attendance+arena_temp+avgnoisedb,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
+pairs(~shot_zone_basic+shot_zone_area+shot_zone_range+game_date+opponent+attendance+arena_temp+avgnoisedb,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 
+```
+
+```{r logTransformations}
+#we have 0s in the shot_distance field, so we need to add a small number so we can take the log transform.
+trainData$log_shot_distance = log(trainData$shot_distance + 0.001)
+#we have negative values in the following fields, so we need to add a constant so we can take the log tranform.
+trainData$log_lat = log(trainData$lat + (1 - min(trainData$lat)))
+trainData$log_loc_y = log(trainData$loc_y + (1 - min(trainData$loc_y)))
+
+#the above log transformations don't seem to help at all.
+pairs(~log_shot_distance+log_lat+log_loc_y,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 ```
