@@ -161,3 +161,7 @@ car::vif(model2)
 datavif2 <- car::vif(model2)
 write.csv(datavif2, "datavif2.csv")
 ```
+
+```{r exportData}
+write.csv(trainData, "trainDataClean.csv")
+```
