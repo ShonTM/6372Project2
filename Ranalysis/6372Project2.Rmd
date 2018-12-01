@@ -163,5 +163,5 @@ write.csv(datavif2, "datavif2.csv")
 ```
 
 ```{r exportData}
-write.csv(trainData, "trainDataClean.csv")
+write.csv(trainData, "trainDataClean.csv", row.names = FALSE)
 ```
