@@ -163,5 +163,6 @@ write.csv(datavif2, "datavif2.csv")
 ```
 
 ```{r exportData}
+trainData$season <- substr(trainData$season, 1,4)
 write.csv(trainData, "trainDataClean.csv", row.names = FALSE)
 ```
