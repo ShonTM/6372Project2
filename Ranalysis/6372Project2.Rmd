@@ -36,10 +36,15 @@ addConstantForLogTransform <- function(x)
 trainData <- read.csv("project2Data.csv")
 ```
 
+```{r dataTransformations}
+trainData$time_remaining_period <- trainData$seconds_remaining +(60*trainData$minutes_remaining) 
+trainData$game_time <- (12*60 - trainData$time_remaining_period) + ((trainData$period - 1)*12*60)
+```
+
 ```{r outlierAnalysis}
 pairs(~shot_made_flag+action_type+combined_shot_type+lat+lon+loc_x+loc_y,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 
-pairs(~minutes_remaining+seconds_remaining+period+playoffs+season+shot_distance+shot_type,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
+pairs(~time_remaining_period+game_time+playoffs+season+shot_distance+shot_type,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 
 pairs(~shot_zone_basic+shot_zone_area+shot_zone_range+game_date+opponent+attendance+arena_temp+avgnoisedb,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 
