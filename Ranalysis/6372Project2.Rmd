@@ -9,6 +9,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r libraryImports}
+if(!require(tidyverse)) install.packages("tidyverse")
+if(!require(caret)) install.packages("caret")
+if(!require(knitr)) install.packages("knitr")
+```
+
 ```{r addUtilityFunctions}
 panel.hist <- function(x, ...)
 {
@@ -28,7 +34,6 @@ addConstantForLogTransform <- function(x)
 
 ```{r importData}
 trainData <- read.csv("project2Data.csv")
-
 ```
 
 ```{r outlierAnalysis}
@@ -50,3 +55,29 @@ trainData$log_loc_y = log(addConstantForLogTransform(trainData$loc_y))
 #the above log transformations don't seem to help much at all.
 pairs(~log_shot_distance+log_lat+log_loc_y,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 ```
+
+<!-- ```{r varianceInflationFactor} -->
+<!-- set.seed(123) -->
+<!-- trainData.samples <- trainData$shot_made_flag %>% -->
+<!--   createDataPartition(p = 0.8, list = FALSE) -->
+<!-- train.data  <- trainData[trainData.samples, ] -->
+<!-- test.data <- trainData[-trainData.samples, ] -->
+
+
+<!-- # Build the model -->
+<!-- model1 <- lm(shot_made_flag ~., data = train.data) -->
+<!-- # Make predictions -->
+<!-- predictions <- model1 %>% predict(test.data) -->
+<!-- # Model performance -->
+<!-- data.frame( -->
+<!--   RMSE = RMSE(predictions, test.data$shot_made_flag), -->
+<!--   R2 = R2(predictions, test.data$shot_made_flag) -->
+<!-- ) -->
+
+<!-- # Determine multicollinearity -->
+<!-- car::vif(model1) -->
+
+<!-- # Write variable VIF to csv file for analysis -->
+<!-- datavif <- car::vif(model1) -->
+<!-- write.csv(datavif, "datavif.csv") -->
+<!-- ``` -->
