@@ -61,28 +61,103 @@ trainData$log_loc_y = log(addConstantForLogTransform(trainData$loc_y))
 pairs(~log_shot_distance+log_lat+log_loc_y,data=trainData,main="Simple Scatterplot Matrix", diag.panel=panel.hist)
 ```
 
-<!-- ```{r varianceInflationFactor} -->
-<!-- set.seed(123) -->
-<!-- trainData.samples <- trainData$shot_made_flag %>% -->
-<!--   createDataPartition(p = 0.8, list = FALSE) -->
-<!-- train.data  <- trainData[trainData.samples, ] -->
-<!-- test.data <- trainData[-trainData.samples, ] -->
+```{r varianceInflationFactor}
+trainData$team_name <- NULL #this is always Lakers
+trainData$team_id <- NULL #this is always Lakers
+trainData$game_date <- NULL
+trainData$matchup <- NULL
+trainData$recId <- NULL
+trainData$game_event_id <- NULL
+trainData$game_id <- NULL
+trainData$shot_id <- NULL
+trainData$combined_shot_type <- NULL
+trainData$shot_zone_basic <- NULL
+trainData$loc_x <- NULL
+trainData$loc_y <- NULL
+trainData$shot_zone_range <- NULL
+trainData$log_lat <-NULL
+trainData$log_loc_y <-NULL
+trainData$log_shot_distance <-NULL
+trainData$minutes_remaining <-NULL
+trainData$seconds_remaining <-NULL
+trainData$period <-NULL
 
 
-<!-- # Build the model -->
-<!-- model1 <- lm(shot_made_flag ~., data = train.data) -->
-<!-- # Make predictions -->
-<!-- predictions <- model1 %>% predict(test.data) -->
-<!-- # Model performance -->
-<!-- data.frame( -->
-<!--   RMSE = RMSE(predictions, test.data$shot_made_flag), -->
-<!--   R2 = R2(predictions, test.data$shot_made_flag) -->
-<!-- ) -->
+set.seed(123)
+trainData.samples <- trainData$shot_made_flag %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- trainData[trainData.samples, ]
+test.data <- trainData[-trainData.samples, ]
 
-<!-- # Determine multicollinearity -->
-<!-- car::vif(model1) -->
 
-<!-- # Write variable VIF to csv file for analysis -->
-<!-- datavif <- car::vif(model1) -->
-<!-- write.csv(datavif, "datavif.csv") -->
-<!-- ``` -->
+# Build the model
+model1 <- lm(shot_made_flag~., data = train.data)
+# Make predictions
+predictions <- model1 %>% predict(test.data)
+# Model performance
+data.frame(
+  RMSE = RMSE(predictions, test.data$shot_made_flag),
+  R2 = R2(predictions, test.data$shot_made_flag)
+)
+
+# Determine multicollinearity
+car::vif(model1)
+
+# Write variable VIF to csv file for analysis
+datavif <- car::vif(model1)
+write.csv(datavif, "datavif.csv")
+
+#after successful vif run, we removed the following variable
+trainData$shot_zone_area <- NULL
+
+set.seed(123)
+trainData.samples <- trainData$shot_made_flag %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- trainData[trainData.samples, ]
+test.data <- trainData[-trainData.samples, ]
+
+
+# Build the model
+model1 <- lm(shot_made_flag ~., data = train.data)
+# Make predictions
+predictions <- model1 %>% predict(test.data)
+# Model performance
+data.frame(
+  RMSE = RMSE(predictions, test.data$shot_made_flag),
+  R2 = R2(predictions, test.data$shot_made_flag)
+)
+
+# Determine multicollinearity
+car::vif(model1)
+
+# Write variable VIF to csv file for analysis
+datavif <- car::vif(model1)
+write.csv(datavif, "datavif.csv")
+
+trainData2 <- trainData
+trainData2$action_type <- NULL
+
+set.seed(123)
+trainData2.samples <- trainData2$shot_made_flag %>%
+  createDataPartition(p = 0.8, list = FALSE)
+train2.data  <- trainData2[trainData2.samples, ]
+test2.data <- trainData2[-trainData2.samples, ]
+
+
+# Build the model
+model2 <- lm(shot_made_flag ~., data = train2.data)
+# Make predictions
+predictions2 <- model2 %>% predict(test2.data)
+# Model performance
+data.frame(
+  RMSE = RMSE(predictions2, test2.data$shot_made_flag),
+  R2 = R2(predictions2, test2.data$shot_made_flag)
+)
+
+# Determine multicollinearity
+car::vif(model2)
+
+# Write variable VIF to csv file for analysis
+datavif2 <- car::vif(model2)
+write.csv(datavif2, "datavif2.csv")
+```
