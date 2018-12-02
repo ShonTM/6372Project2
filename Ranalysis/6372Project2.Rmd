@@ -36,6 +36,27 @@ addConstantForLogTransform <- function(x)
 trainData <- read.csv("project2Data.csv")
 ```
 
+```{r}
+#changing factors to numeric for data analysis
+factorizeddata <- trainData
+factorizeddata$action_type_int <- as.numeric(factorizeddata$action_type)
+factorizeddata$combined_shot_type_int <- as.numeric(factorizeddata$combined_shot_type)
+factorizeddata$shot_type_int <- as.numeric(factorizeddata$shot_type)
+factorizeddata$shot_zone_are_int <- as.numeric(factorizeddata$shot_zone_area)
+factorizeddata$shot_zone_basic_int <- as.numeric(factorizeddata$shot_zone_basic)
+factorizeddata$shot_zone_range_int <- as.numeric(factorizeddata$shot_zone_range)
+factorizeddata$opponent_int <- as.numeric(factorizeddata$opponent)
+head(factorizeddata)
+write.csv(factorizeddata, "factorizeddata.csv", row.names = FALSE)
+
+
+```
+
+
+
+
+
+
 ```{r dataTransformations}
 trainData$time_remaining_period <- trainData$seconds_remaining +(60*trainData$minutes_remaining) 
 trainData$game_time <- (12*60 - trainData$time_remaining_period) + ((trainData$period - 1)*12*60)
