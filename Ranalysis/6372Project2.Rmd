@@ -57,6 +57,21 @@ head(allData)
 trainDataFactorized <- allData[is.na(allData$shot_made_flag) == FALSE,]
 testDataFactorized <- allData[is.na(allData$shot_made_flag) == TRUE,]
 
+trainDataFactorized$log_lat = log(trainDataFactorized$lat)
+#we have 0s in the shot_distance field, so we need to add a small number so we can take the log transform.
+trainDataFactorized$log_shot_distance = log(trainDataFactorized$shot_distance + 0.001)
+#we have negative values in the following fields, so we need to add a constant so we can take the log tranform.
+trainDataFactorized$log_loc_y = log(addConstantForLogTransform(trainDataFactorized$loc_y))
+
+testDataFactorized$log_lat = log(testDataFactorized$lat)
+#we have 0s in the shot_distance field, so we need to add a small number so we can take the log transform.
+testDataFactorized$log_shot_distance = log(testDataFactorized$shot_distance + 0.001)
+#we have negative values in the following fields, so we need to add a constant so we can take the log tranform.
+testDataFactorized$log_loc_y = log(addConstantForLogTransform(testDataFactorized$loc_y))
+
+trainDataFactorized$season <- substr(trainDataFactorized$season, 1,4)
+testDataFactorized$season <- substr(testDataFactorized$season, 1,4)
+
 write.csv(trainDataFactorized, "trainDataFactorized.csv", row.names = FALSE)
 write.csv(testDataFactorized, "testDataFactorized.csv", row.names = FALSE)
 

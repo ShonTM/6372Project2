@@ -6,7 +6,7 @@
 %web_drop_table(trainData);
 
 
-FILENAME REFFILE '/home/dserna0/Code/6372/GroupProject2/factorizeddata.csv';
+FILENAME REFFILE '/home/dserna0/Code/6372/GroupProject2/trainDataFactorized.csv';
 
 PROC IMPORT DATAFILE=REFFILE
 	DBMS=CSV
@@ -19,21 +19,21 @@ PROC CONTENTS DATA=trainData; RUN;
 
 %web_open_table(trainData);
 
-%web_drop_table(trainDataClean);
+%web_drop_table(testData);
 
 
-FILENAME REFFILE '/home/dserna0/Code/6372/GroupProject2/trainDataClean.csv';
+FILENAME REFFILE '/home/dserna0/Code/6372/GroupProject2/testDataFactorized.csv';
 
 PROC IMPORT DATAFILE=REFFILE
 	DBMS=CSV
-	OUT=trainDataClean;
+	OUT=testData;
 	GETNAMES=YES;
 RUN;
 
-PROC CONTENTS DATA=trainDataClean; RUN;
+PROC CONTENTS DATA=testData; RUN;
 
 
-%web_open_table(trainDataClean);
+%web_open_table(testData);
 
 /* data type conversions */
 data trainData;
@@ -42,21 +42,32 @@ intSeason = input(season, BEST32.);
 drop season;
 rename intSeason = season;
 
-data trainDataClean;
-set trainDataClean;
+data testData;
+set testData;
 intSeason = input(season, BEST32.);
 drop season;
 rename intSeason = season;
 run;
 
-/* transformations */
-data trainDataClean;
-set trainDataClean;
-log_shot_distance = log(shot_distance);
-log_lat = log(lat);
-log_loc_y = log(log_loc_y);
+data testData;
+set testData;
+int_shot_made_flag = input(shot_made_flag, BEST32.);
+drop shot_made_flag;
+rename int_shot_made_flag = shot_made_flag;
 run;
 
+data trainData;
+set trainData;
+Obs = _n_;
+run;
+
+data testData;
+set testData;
+Obs = _n_;
+run;
+
+/* transformations */
+/*
 data trainData;
 set trainData;
 log_shot_distance = log(shot_distance);
@@ -64,6 +75,13 @@ log_lat = log(lat);
 log_loc_y = log(loc_y);
 run;
 
+data testData;
+set testData;
+log_shot_distance = log(shot_distance);
+log_lat = log(lat);
+log_loc_y = log(loc_y);
+run;
+*/
 
 /*categorical variable conversions*/
 /*
@@ -145,15 +163,6 @@ if opponent = "WAS" then opponent_int = 33;
 run;
 */
 
-data trainDataClean;
-set trainDataClean;
-Obs = _n_;
-run;
-
-data trainData;
-set trainData;
-Obs = _n_;
-run;
 
 
 /* Proposition 1 - Odds Ratio */
@@ -167,6 +176,21 @@ data trainDataNonPlayoffs;
 set trainData;
 if playoffs EQ 1 then delete;
 run;
+
+data manualOdds;
+input group$ response$ n;
+datalines;
+non-playoff made 9794
+non-playoff notmade 12145
+playoff made 1671
+playoff notmade 2087
+;
+
+proc freq data = manualOdds order = data;
+weight n;
+tables group*response / riskdiff(equal var=null cl=wald) relrisk;
+run;
+
 
 data trainDataPlayoffs;
 set trainData;
@@ -190,9 +214,32 @@ run;
 
 
 /* Predictive Models - Logistic Regression  */
+/*train the model*/
 proc logistic data = trainData descending;
 model shot_made_flag(event="1") = action_type_int shot_type_int shot_zone_range_int opponent_int log_lat log_loc_y lon minutes_remaining playoffs season seconds_remaining log_shot_distance arena_temp / selection=stepwise ctable pprob = 0.5;
 output out=logisticOut predprobs = I p=predprob resdev=resdev reschi=pearres;
+run;
+
+/*logistic prediction*/
+data predictionData;
+set trainData testData;
+run;
+
+proc logistic data = predictionData descending;
+model shot_made_flag = action_type_int shot_type_int shot_zone_range_int opponent_int log_lat log_loc_y lon minutes_remaining playoffs season seconds_remaining log_shot_distance arena_temp / selection=stepwise ctable pprob = 0.5;
+output out=logisticOut predprobs = I p=predprob resdev=resdev reschi=pearres;
+run;
+
+data logisticResults;
+set logisticOut;
+keep rannum shot_made_flag predprob;
+where shot_made_flag EQ .;
+run;
+
+data logisticResults;
+set logisticResults;
+if predprob >= 0.50 then shot_made_flag = 1;
+if predprob < 0.50 then shot_made_flag = 0;
 run;
 
 /* Predictive Models - Linear Discriminant Analysis */
