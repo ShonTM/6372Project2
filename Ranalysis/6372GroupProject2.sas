@@ -265,6 +265,27 @@ rename '1'n = shot_made_probability;
 rename '0'n = shot_not_made_probability;
 run;
 
+/* generate prediction */
+proc discrim data=trainData pool=YES crossvalidate testdata=testData testout=ldaResults;
+class shot_made_flag;
+var action_type_int shot_type_int shot_zone_range_int opponent_int log_lat log_loc_y lon minutes_remaining playoffs season seconds_remaining log_shot_distance arena_temp;
+priors "1" = 0.5 "0" = 0.5;
+run;
+
+data ldaResults;
+set ldaResults;
+rename '1'n = shot_made_probability;
+rename '0'n = shot_not_made_probability;
+run;
+
+data ldaResults;
+set ldaResults;
+if shot_made_probability >= 0.50 then shot_made_flag = 1;
+if shot_made_probability < 0.50 then shot_made_flag = 0;
+keep rannum shot_made_flag shot_made_probability shot_not_made_probability;
+run;
+
+
 /* Proposition 2 - probability shot_made decreases with distance */
 proc reg data=discrimOut;
 model shot_distance = shot_made_probability;
