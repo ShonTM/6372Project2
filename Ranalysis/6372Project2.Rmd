@@ -34,27 +34,33 @@ addConstantForLogTransform <- function(x)
 
 ```{r importData}
 trainData <- read.csv("project2Data.csv")
+testData <- read.csv("project2Pred.csv")
 ```
 
 ```{r}
 #changing factors to numeric for data analysis
-factorizeddata <- trainData
-factorizeddata$action_type_int <- as.numeric(factorizeddata$action_type)
-factorizeddata$combined_shot_type_int <- as.numeric(factorizeddata$combined_shot_type)
-factorizeddata$shot_type_int <- as.numeric(factorizeddata$shot_type)
-factorizeddata$shot_zone_are_int <- as.numeric(factorizeddata$shot_zone_area)
-factorizeddata$shot_zone_basic_int <- as.numeric(factorizeddata$shot_zone_basic)
-factorizeddata$shot_zone_range_int <- as.numeric(factorizeddata$shot_zone_range)
-factorizeddata$opponent_int <- as.numeric(factorizeddata$opponent)
-head(factorizeddata)
-write.csv(factorizeddata, "factorizeddata.csv", row.names = FALSE)
+trainData$rannum <- trainData$recId
+trainData$recId <- NULL
+allData <- rbind(trainData, testData)
 
+allData$action_type_int <- as.numeric(allData$action_type)
+allData$combined_shot_type_int <- as.numeric(allData$combined_shot_type)
+allData$shot_type_int <- as.numeric(allData$shot_type)
+allData$shot_zone_are_int <- as.numeric(allData$shot_zone_area)
+allData$shot_zone_basic_int <- as.numeric(allData$shot_zone_basic)
+allData$shot_zone_range_int <- as.numeric(allData$shot_zone_range)
+allData$opponent_int <- as.numeric(allData$opponent)
+allData$time_remaining_period <- allData$seconds_remaining +(60*allData$minutes_remaining) 
+allData$game_time <- (12*60 - allData$time_remaining_period) + ((allData$period - 1)*12*60)
+head(allData)
+
+trainDataFactorized <- allData[is.na(allData$shot_made_flag) == FALSE,]
+testDataFactorized <- allData[is.na(allData$shot_made_flag) == TRUE,]
+
+write.csv(trainDataFactorized, "trainDataFactorized.csv", row.names = FALSE)
+write.csv(testDataFactorized, "testDataFactorized.csv", row.names = FALSE)
 
 ```
-
-
-
-
 
 
 ```{r dataTransformations}
