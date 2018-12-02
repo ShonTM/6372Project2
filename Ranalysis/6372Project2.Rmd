@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 if(!require(tidyverse)) install.packages("tidyverse")
 if(!require(caret)) install.packages("caret")
 if(!require(knitr)) install.packages("knitr")
+if(!require(MLmetrics)) install.packages("MLmetrics")
 ```
 
 ```{r addUtilityFunctions}
@@ -208,3 +209,22 @@ write.csv(datavif2, "datavif2.csv")
 trainData$season <- substr(trainData$season, 1,4)
 write.csv(trainData, "trainDataClean.csv", row.names = FALSE)
 ```
+
+
+```{r log loss function}
+library(MLmetrics)
+loglossdata <- read.csv("LOGISTICOUT.csv")
+y_pred <- loglossdata$predprob
+x_true <- loglossdata$shot_made_flag
+loglossoutput <- LogLoss(y_pred, x_true)
+loglossoutput
+
+loglossdata1 <- read.csv("DISCRIMOUT.csv")
+y_pred1 <- loglossdata1$shot_made_probability
+x_true1 <- loglossdata1$shot_made_flag
+loglossoutput1 <- LogLoss(y_pred1, x_true1)
+loglossoutput1
+
+```
+
+
